@@ -1,7 +1,10 @@
-require_relative 'player'
+load 'player.rb'
 
 class BattleRoyale
-  def self.menu
+  @@arrPlayer = Array.new
+  @@mode = "new"
+  
+  def initialize
     puts "#==============================#"
     puts "#"
     puts "Welcome to Battle Arena"
@@ -20,33 +23,58 @@ class BattleRoyale
     puts "# * max player 2 atau 3"
     puts "#"
     puts "#-----------------------------------------------------#"
-    input = gets.chomp
-    if (input.eql? "new")
-      BattleRoyale.inputPlayer
-      end
-    end
-
-  def self.inputPlayer
-    puts "#==============================#"
-    puts "#"
-    puts "Welcome to Battle Arena"
-    puts "#"
-    puts "#-----------------------------------------------------#"
-    puts "# Description :"
-    puts "#"
-    puts "# 1. ketik “new” untuk membuat karakter #"
-    puts "# 2. ketik “start” untuk memulai pertarungan #"
-    puts "#-----------------------------------------------------#"
-    puts "#"
-    puts "-"
-    puts "#"
-    puts "# * max player 2 atau 3"
-    puts "#"
-    puts "#-----------------------------------------------------#"    
-    puts "# Masukan Nama Player : "
-    input = gets.chomp
-    player1 = Player.new input
-    BattleRoyale.menu
+    playGame()
+   end
+   
+   def playGame
+     while !isGameOver() do
+       if @@mode.eql? "new" and @@arrPlayer.length < 3 then
+         puts "Pilih mode : "
+         input = gets.chomp
+       else
+         input = "start"
+       end
+       if input.eql? "new" then
+         @@mode = "new"
+         puts "Input player name : "
+         name = gets.chomp
+         @@arrPlayer.push Player.new name
+       elsif input.eql? "start" then
+         if @@arrPlayer.length < 2 then
+           puts "Jumlah pemain kurang"
+         else
+           @@mode = "play"
+           puts "siapa yang akan menyerang : "
+           namaPenyerang = gets.chomp
+           puts "siapa yang diserang : "
+           namaTarget = gets.chomp
+           if namaPenyerang.eql? namaTarget then
+             puts "tidak bisa menyerang ke diri sendiri"
+           else
+             puts "Descriptions"
+             for player in @@arrPlayer do
+               if player.name.eql? namaPenyerang then
+                 player.attack()
+               elsif player.name.eql? namaTarget then
+                 player.defense()
+               end
+               puts "#{player.name} : manna = #{player.manna}, blood = #{player.blood}"
+            end
+          end
+       end
+     else
+       puts "Error input"
+     end
   end
-end
-BattleRoyale.menu
+    puts "Game Over"
+  end
+
+  def isGameOver
+    gameOver = false
+    for player in @@arrPlayer do
+      gameOver = gameOver || player.isGameOver()
+    end
+    gameOver
+    end
+  end
+  br = BattleRoyale.new
